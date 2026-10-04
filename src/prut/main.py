@@ -6,6 +6,7 @@ from pathlib import Path
 from .interpreter import Interpreter
 from .lexer import Lexer
 from .parser import Parser
+from .repl import run_repl
 
 def run_source(source: str) -> None:
 """Run Prut source code."""
@@ -52,14 +53,21 @@ def main() -> None:
 """Start the Prut command-line interface."""
 
 ```
-if len(sys.argv) != 2:
-    print("Prut programming language")
-    print()
-    print("Usage:")
-    print("  python -m prut <file.prut>")
-    sys.exit(1)
+if len(sys.argv) == 1:
+    run_repl()
+    return
 
-run_file(sys.argv[1])
+if len(sys.argv) == 2:
+    run_file(sys.argv[1])
+    return
+
+print("Prut programming language")
+print()
+print("Usage:")
+print("  prut")
+print("  prut <file.prut>")
+
+sys.exit(1)
 ```
 
 if **name** == "**main**":
