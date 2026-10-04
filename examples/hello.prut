@@ -1,0 +1,10 @@
+say "Hello, world!"
+
+set name = "Jed"
+say name
+
+set number = 10
+say number + 5
+
+say 10 * 2
+say 20 / 4
