@@ -1,38 +1,33 @@
 # Python
-
-**pycache**/
+__pycache__/
 *.py[cod]
-*$py.class
+*.pyo
 
 # Virtual environments
-
 .venv/
 venv/
 env/
-ENV/
 
 # Testing
-
 .pytest_cache/
 .coverage
 htmlcov/
 
-# Build files
-
+# Build artifacts
 build/
 dist/
 *.egg-info/
 
-# IDEs and editors
+# PyInstaller
+*.spec
 
+# Local Prut files
+myprogram.prut
+
+# IDEs
 .vscode/
 .idea/
 
-# Operating system files
-
+# OS files
 .DS_Store
 Thumbs.db
-
-# Prut
-
-*.prutc
