@@ -1,3 +1,4 @@
+```python
 """Lexer for the Prut programming language."""
 
 from dataclasses import dataclass
@@ -5,29 +6,40 @@ from enum import Enum, auto
 
 
 class TokenType(Enum):
-    """Types of tokens recognised by Prut."""
+    """Types of tokens supported by Prut."""
 
     KEYWORD = auto()
     IDENTIFIER = auto()
     STRING = auto()
     NUMBER = auto()
+    BOOLEAN = auto()
+
     PLUS = auto()
     MINUS = auto()
     STAR = auto()
     SLASH = auto()
+
     EQUALS = auto()
+    EQUALS_EQUALS = auto()
+    NOT_EQUALS = auto()
+    GREATER_THAN = auto()
+    LESS_THAN = auto()
+    GREATER_EQUALS = auto()
+    LESS_EQUALS = auto()
+
     LEFT_PAREN = auto()
     RIGHT_PAREN = auto()
+
     NEWLINE = auto()
     EOF = auto()
 
 
 @dataclass
 class Token:
-    """A single token produced by the lexer."""
+    """A single Prut token."""
 
     type: TokenType
-    value: str
+    value: object
     line: int
     column: int
 
@@ -41,14 +53,9 @@ KEYWORDS = {
     "function",
 }
 
-SIMPLE_TOKENS = {
-    "+": TokenType.PLUS,
-    "-": TokenType.MINUS,
-    "*": TokenType.STAR,
-    "/": TokenType.SLASH,
-    "=": TokenType.EQUALS,
-    "(": TokenType.LEFT_PAREN,
-    ")": TokenType.RIGHT_PAREN,
+BOOLEANS = {
+    "true": True,
+    "false": False,
 }
 
 
@@ -60,113 +67,304 @@ class Lexer:
         self.position = 0
         self.line = 1
         self.column = 1
-        self.tokens: list[Token] = []
 
     def tokenize(self) -> list[Token]:
-        """Tokenize the entire source file."""
-        while not self._at_end():
-            character = self._current()
+        """Tokenize the entire source."""
+
+        tokens = []
+
+        while self.position < len(self.source):
+            character = self.source[self.position]
 
             if character in " \t\r":
                 self._advance()
-            elif character == "\n":
-                self.tokens.append(
-                    Token(TokenType.NEWLINE, "\\n", self.line, self.column)
+                continue
+
+            if character == "\n":
+                tokens.append(
+                    Token(
+                        TokenType.NEWLINE,
+                        "\n",
+                        self.line,
+                        self.column,
+                    )
                 )
                 self._advance()
                 self.line += 1
                 self.column = 1
-            elif character == '"':
-                self._read_string()
-            elif character.isdigit():
-                self._read_number()
-            elif character.isalpha() or character == "_":
-                self._read_identifier()
-            elif character in SIMPLE_TOKENS:
-                self._add_simple_token(SIMPLE_TOKENS[character], character)
+                continue
+
+            if character == '"':
+                tokens.append(self._read_string())
+                continue
+
+            if character.isdigit():
+                tokens.append(self._read_number())
+                continue
+
+            if character.isalpha() or character == "_":
+                tokens.append(self._read_identifier())
+                continue
+
+            line = self.line
+            column = self.column
+
+            if character == "+":
+                tokens.append(Token(TokenType.PLUS, "+", line, column))
                 self._advance()
+
+            elif character == "-":
+                tokens.append(Token(TokenType.MINUS, "-", line, column))
+                self._advance()
+
+            elif character == "*":
+                tokens.append(Token(TokenType.STAR, "*", line, column))
+                self._advance()
+
+            elif character == "/":
+                tokens.append(Token(TokenType.SLASH, "/", line, column))
+                self._advance()
+
+            elif character == "=":
+                self._advance()
+
+                if self._current_character() == "=":
+                    tokens.append(
+                        Token(
+                            TokenType.EQUALS_EQUALS,
+                            "==",
+                            line,
+                            column,
+                        )
+                    )
+                    self._advance()
+                else:
+                    tokens.append(
+                        Token(
+                            TokenType.EQUALS,
+                            "=",
+                            line,
+                            column,
+                        )
+                    )
+
+            elif character == "!":
+                self._advance()
+
+                if self._current_character() == "=":
+                    tokens.append(
+                        Token(
+                            TokenType.NOT_EQUALS,
+                            "!=",
+                            line,
+                            column,
+                        )
+                    )
+                    self._advance()
+                else:
+                    raise SyntaxError(
+                        f"Unexpected character '!' at "
+                        f"line {line}, column {column}."
+                    )
+
+            elif character == ">":
+                self._advance()
+
+                if self._current_character() == "=":
+                    tokens.append(
+                        Token(
+                            TokenType.GREATER_EQUALS,
+                            ">=",
+                            line,
+                            column,
+                        )
+                    )
+                    self._advance()
+                else:
+                    tokens.append(
+                        Token(
+                            TokenType.GREATER_THAN,
+                            ">",
+                            line,
+                            column,
+                        )
+                    )
+
+            elif character == "<":
+                self._advance()
+
+                if self._current_character() == "=":
+                    tokens.append(
+                        Token(
+                            TokenType.LESS_EQUALS,
+                            "<=",
+                            line,
+                            column,
+                        )
+                    )
+                    self._advance()
+                else:
+                    tokens.append(
+                        Token(
+                            TokenType.LESS_THAN,
+                            "<",
+                            line,
+                            column,
+                        )
+                    )
+
+            elif character == "(":
+                tokens.append(
+                    Token(
+                        TokenType.LEFT_PAREN,
+                        "(",
+                        line,
+                        column,
+                    )
+                )
+                self._advance()
+
+            elif character == ")":
+                tokens.append(
+                    Token(
+                        TokenType.RIGHT_PAREN,
+                        ")",
+                        line,
+                        column,
+                    )
+                )
+                self._advance()
+
             else:
                 raise SyntaxError(
-                    f"Unexpected character '{character}' "
-                    f"at line {self.line}, column {self.column}"
+                    f"Unexpected character '{character}' at "
+                    f"line {line}, column {column}."
                 )
 
-        self.tokens.append(Token(TokenType.EOF, "", self.line, self.column))
-        return self.tokens
+        tokens.append(
+            Token(
+                TokenType.EOF,
+                None,
+                self.line,
+                self.column,
+            )
+        )
 
-    def _current(self) -> str:
-        """Return the current character."""
+        return tokens
+
+    def _read_string(self) -> Token:
+        """Read a string literal."""
+
+        line = self.line
+        column = self.column
+
+        self._advance()
+
+        characters = []
+
+        while self.position < len(self.source):
+            character = self.source[self.position]
+
+            if character == '"':
+                self._advance()
+
+                return Token(
+                    TokenType.STRING,
+                    "".join(characters),
+                    line,
+                    column,
+                )
+
+            if character == "\n":
+                raise SyntaxError(
+                    f"Unterminated string at line {line}, "
+                    f"column {column}."
+                )
+
+            characters.append(character)
+            self._advance()
+
+        raise SyntaxError(
+            f"Unterminated string at line {line}, column {column}."
+        )
+
+    def _read_number(self) -> Token:
+        """Read a numeric literal."""
+
+        line = self.line
+        column = self.column
+
+        characters = []
+
+        while (
+            self.position < len(self.source)
+            and self.source[self.position].isdigit()
+        ):
+            characters.append(self.source[self.position])
+            self._advance()
+
+        value = int("".join(characters))
+
+        return Token(
+            TokenType.NUMBER,
+            value,
+            line,
+            column,
+        )
+
+    def _read_identifier(self) -> Token:
+        """Read an identifier, keyword, or boolean."""
+
+        line = self.line
+        column = self.column
+
+        characters = []
+
+        while self.position < len(self.source):
+            character = self.source[self.position]
+
+            if not (character.isalnum() or character == "_"):
+                break
+
+            characters.append(character)
+            self._advance()
+
+        value = "".join(characters)
+
+        if value in BOOLEANS:
+            return Token(
+                TokenType.BOOLEAN,
+                BOOLEANS[value],
+                line,
+                column,
+            )
+
+        if value in KEYWORDS:
+            return Token(
+                TokenType.KEYWORD,
+                value,
+                line,
+                column,
+            )
+
+        return Token(
+            TokenType.IDENTIFIER,
+            value,
+            line,
+            column,
+        )
+
+    def _current_character(self) -> str | None:
+        """Return the current character without advancing."""
+
+        if self.position >= len(self.source):
+            return None
+
         return self.source[self.position]
 
     def _advance(self) -> None:
         """Move to the next character."""
+
         self.position += 1
         self.column += 1
-
-    def _at_end(self) -> bool:
-        """Return True when the source has been fully read."""
-        return self.position >= len(self.source)
-
-    def _add_simple_token(self, token_type: TokenType, value: str) -> None:
-        """Add a simple one-character token."""
-        self.tokens.append(Token(token_type, value, self.line, self.column))
-
-    def _read_string(self) -> None:
-        """Read a quoted string."""
-        start_line = self.line
-        start_column = self.column
-        self._advance()
-        value = ""
-
-        while not self._at_end() and self._current() != '"':
-            if self._current() == "\n":
-                raise SyntaxError(
-                    f"Unterminated string at line {start_line}, "
-                    f"column {start_column}"
-                )
-            value += self._current()
-            self._advance()
-
-        if self._at_end():
-            raise SyntaxError(
-                f"Unterminated string at line {start_line}, "
-                f"column {start_column}"
-            )
-
-        self._advance()
-        self.tokens.append(
-            Token(TokenType.STRING, value, start_line, start_column)
-        )
-
-    def _read_number(self) -> None:
-        """Read an integer number."""
-        start_line = self.line
-        start_column = self.column
-        value = ""
-
-        while not self._at_end() and self._current().isdigit():
-            value += self._current()
-            self._advance()
-
-        self.tokens.append(
-            Token(TokenType.NUMBER, value, start_line, start_column)
-        )
-
-    def _read_identifier(self) -> None:
-        """Read an identifier or keyword."""
-        start_line = self.line
-        start_column = self.column
-        value = ""
-
-        while not self._at_end() and (
-            self._current().isalnum() or self._current() == "_"
-        ):
-            value += self._current()
-            self._advance()
-
-        if value in KEYWORDS:
-            token_type = TokenType.KEYWORD
-        else:
-            token_type = TokenType.IDENTIFIER
-
-        self.tokens.append(Token(token_type, value, start_line, start_column))
+```
