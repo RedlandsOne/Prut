@@ -1,1 +1,1190 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <title>Prut Playground</title>
+
+    <style>
+        :root {
+            color-scheme: dark;
+
+            --background: #0b1020;
+            --surface: #121a2c;
+            --surface-alt: #0e1627;
+            --border: #26334d;
+            --text: #eef2ff;
+            --muted: #9aa7bd;
+
+            --accent: #4f7cff;
+            --accent-hover: #3f6eea;
+            --success: #20b26b;
+            --danger: #ef5350;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            min-height: 100%;
+        }
+
+        body {
+            background: var(--background);
+            color: var(--text);
+
+            font-family:
+                Inter,
+                ui-sans-serif,
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+        }
+
+        button,
+        textarea {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        /* Header */
+
+        header {
+            height: 72px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 24px;
+
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .logo {
+            width: 38px;
+            height: 38px;
+
+            display: grid;
+            place-items: center;
+
+            border-radius: 10px;
+
+            background: linear-gradient(
+                135deg,
+                var(--accent),
+                #6d5dfc
+            );
+
+            color: white;
+
+            font-size: 20px;
+            font-weight: 900;
+
+            box-shadow: 0 6px 18px rgba(79, 124, 255, 0.2);
+        }
+
+        .badge {
+            padding: 5px 9px;
+
+            border: 1px solid var(--border);
+            border-radius: 999px;
+
+            color: var(--muted);
+
+            font-size: 12px;
+            font-weight: 650;
+        }
+
+        /* Main */
+
+        main {
+            width: min(1250px, 100%);
+
+            margin: 0 auto;
+
+            padding: 30px 20px 50px;
+        }
+
+        .hero {
+            margin-bottom: 22px;
+        }
+
+        .hero h1 {
+            margin: 0 0 8px;
+
+            font-size: 32px;
+            letter-spacing: -0.04em;
+        }
+
+        .hero p {
+            margin: 0;
+
+            color: var(--muted);
+
+            font-size: 15px;
+        }
+
+        /* Workspace */
+
+        .workspace {
+            display: grid;
+
+            grid-template-columns:
+                minmax(0, 1fr)
+                minmax(0, 1fr);
+
+            gap: 16px;
+        }
+
+        .panel {
+            min-width: 0;
+
+            overflow: hidden;
+
+            background: var(--surface);
+
+            border: 1px solid var(--border);
+            border-radius: 16px;
+
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .panel-header {
+            height: 54px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 14px 0 17px;
+
+            border-bottom: 1px solid var(--border);
+        }
+
+        .panel-title {
+            font-weight: 750;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Buttons */
+
+        button {
+            padding: 8px 12px;
+
+            background: var(--surface-alt);
+            color: var(--text);
+
+            border: 1px solid var(--border);
+            border-radius: 9px;
+
+            font-size: 13px;
+            font-weight: 700;
+
+            transition:
+                background 0.15s ease,
+                border-color 0.15s ease,
+                transform 0.1s ease;
+        }
+
+        button:hover {
+            border-color: #52627e;
+            background: #172139;
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        #run {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        #run:hover {
+            background: var(--accent-hover);
+            border-color: var(--accent-hover);
+        }
+
+        /* Editor */
+
+        .editor-container {
+            height: 460px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100%;
+
+            resize: none;
+
+            padding: 20px;
+
+            border: 0;
+            outline: none;
+
+            background: var(--surface-alt);
+            color: var(--text);
+
+            font-family:
+                "SFMono-Regular",
+                Consolas,
+                "Liberation Mono",
+                monospace;
+
+            font-size: 15px;
+            line-height: 1.7;
+
+            tab-size: 4;
+        }
+
+        textarea::selection {
+            background: rgba(79, 124, 255, 0.35);
+        }
+
+        /* Output */
+
+        .output {
+            height: 460px;
+
+            overflow: auto;
+
+            padding: 20px;
+
+            background: var(--surface-alt);
+
+            color: var(--text);
+
+            font-family:
+                "SFMono-Regular",
+                Consolas,
+                "Liberation Mono",
+                monospace;
+
+            font-size: 15px;
+            line-height: 1.7;
+
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .output.placeholder {
+            color: var(--muted);
+        }
+
+        .output.error {
+            color: var(--danger);
+        }
+
+        /* Status */
+
+        .status {
+            min-height: 40px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 9px 16px;
+
+            border-top: 1px solid var(--border);
+
+            color: var(--muted);
+
+            font-size: 12px;
+        }
+
+        .status-success {
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .status-error {
+            color: var(--danger);
+            font-weight: 700;
+        }
+
+        /* Help cards */
+
+        .help {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, minmax(0, 1fr));
+
+            gap: 12px;
+
+            margin-top: 16px;
+        }
+
+        .help-card {
+            padding: 16px;
+
+            background: var(--surface);
+
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .help-card strong {
+            display: block;
+
+            margin-bottom: 7px;
+        }
+
+        .help-card code {
+            color: #7fa0ff;
+
+            font-family:
+                "SFMono-Regular",
+                Consolas,
+                monospace;
+        }
+
+        .help-card span {
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        /* Mobile */
+
+        @media (max-width: 800px) {
+            header {
+                padding: 0 15px;
+            }
+
+            main {
+                padding: 22px 14px 35px;
+            }
+
+            .workspace {
+                grid-template-columns: 1fr;
+            }
+
+            .editor-container,
+            .output {
+                height: 360px;
+            }
+
+            .help {
+                grid-template-columns: 1fr;
+            }
+
+            .badge:last-child {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="app">
+
+    <header>
+
+        <div class="brand">
+            <div class="logo">P</div>
+
+            <span>Prut</span>
+
+            <span class="badge">
+                Playground
+            </span>
+        </div>
+
+        <span class="badge">
+            Runs in your browser
+        </span>
+
+    </header>
+
+
+    <main>
+
+        <section class="hero">
+
+            <h1>
+                Try Prut instantly.
+            </h1>
+
+            <p>
+                Write Prut code, run it, and experiment without installing anything.
+            </p>
+
+        </section>
+
+
+        <section class="workspace">
+
+            <!-- CODE PANEL -->
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <span class="panel-title">
+                        Code
+                    </span>
+
+                    <div class="actions">
+
+                        <button id="exampleButton">
+                            Example
+                        </button>
+
+                        <button id="clearButton">
+                            Clear
+                        </button>
+
+                        <button id="runButton">
+                            ▶ Run
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="editor-container">
+
+                    <textarea
+                        id="code"
+                        spellcheck="false"
+                        aria-label="Prut code editor"
+                    >say "Hello, world!"
+say "Welcome to Prut."</textarea>
+
+                </div>
+
+
+                <div class="status">
+
+                    <span>
+                        Prut Playground
+                    </span>
+
+                    <span
+                        id="status"
+                        class="status-success"
+                    >
+                        Ready
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- OUTPUT PANEL -->
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <span class="panel-title">
+                        Output
+                    </span>
+
+                    <button id="copyButton">
+                        Copy
+                    </button>
+
+                </div>
+
+
+                <div
+                    id="output"
+                    class="output placeholder"
+                >
+                    Click Run to execute your Prut program.
+                </div>
+
+
+                <div class="status">
+
+                    <span>
+                        Browser runtime
+                    </span>
+
+                    <span id="lineCount">
+                        0 lines
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section class="help">
+
+            <div class="help-card">
+
+                <strong>
+                    Print text
+                </strong>
+
+                <code>
+                    say "Hello"
+                </code>
+
+            </div>
+
+
+            <div class="help-card">
+
+                <strong>
+                    Variables
+                </strong>
+
+                <code>
+                    let name = "Jed"
+                </code>
+
+            </div>
+
+
+            <div class="help-card">
+
+                <strong>
+                    Run quickly
+                </strong>
+
+                <span>
+                    Press Ctrl + Enter to run your program.
+                </span>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script>
+    /*
+     * Temporary browser interpreter
+     *
+     * This is a small demonstration runtime.
+     *
+     * Once your real Prut interpreter/compiler supports
+     * WebAssembly, replace runPrut() with the real Prut runtime.
+     */
+
+
+    const codeEditor =
+        document.getElementById("code");
+
+    const output =
+        document.getElementById("output");
+
+    const status =
+        document.getElementById("status");
+
+    const lineCount =
+        document.getElementById("lineCount");
+
+
+    /*
+     * Run Prut
+     */
+
+    function runPrut() {
+
+        const source =
+            codeEditor.value;
+
+        const lines =
+            source.split(/\r?\n/);
+
+        const variables = {};
+
+        const results = [];
+
+
+        for (let index = 0; index < lines.length; index++) {
+
+            const lineNumber =
+                index + 1;
+
+            const line =
+                lines[index].trim();
+
+
+            /*
+             * Ignore empty lines.
+             */
+
+            if (line === "") {
+                continue;
+            }
+
+
+            /*
+             * Ignore comments.
+             */
+
+            if (line.startsWith("#")) {
+                continue;
+            }
+
+
+            /*
+             * Variable declaration:
+             *
+             * let name = "Jed"
+             */
+
+            const variableMatch =
+                line.match(
+                    /^let\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.+)$/
+                );
+
+
+            if (variableMatch) {
+
+                const name =
+                    variableMatch[1];
+
+                const value =
+                    evaluateValue(
+                        variableMatch[2],
+                        variables
+                    );
+
+                variables[name] =
+                    value;
+
+                continue;
+            }
+
+
+            /*
+             * Say statement:
+             *
+             * say "Hello"
+             */
+
+            const sayMatch =
+                line.match(
+                    /^say\s+(.+)$/
+                );
+
+
+            if (sayMatch) {
+
+                const value =
+                    evaluateExpression(
+                        sayMatch[1],
+                        variables
+                    );
+
+                results.push(
+                    String(value)
+                );
+
+                continue;
+            }
+
+
+            /*
+             * Unknown statement.
+             */
+
+            showError(
+                "Unknown statement on line " +
+                lineNumber +
+                ".",
+                line
+            );
+
+            return;
+        }
+
+
+        /*
+         * Display output.
+         */
+
+        output.className =
+            "output";
+
+        output.textContent =
+            results.length > 0
+                ? results.join("\n")
+                : "(program produced no output)";
+
+
+        status.textContent =
+            "Ran successfully";
+
+        status.className =
+            "status-success";
+
+
+        lineCount.textContent =
+            lines.length +
+            (lines.length === 1
+                ? " line"
+                : " lines");
+    }
+
+
+    /*
+     * Evaluate an expression.
+     */
+
+    function evaluateExpression(
+        expression,
+        variables
+    ) {
+
+        /*
+         * Support simple + concatenation.
+         */
+
+        const parts =
+            splitExpression(
+                expression
+            );
+
+
+        if (parts.length > 1) {
+
+            return parts
+                .map(part =>
+                    evaluateValue(
+                        part,
+                        variables
+                    )
+                )
+                .join("");
+        }
+
+
+        return evaluateValue(
+            expression,
+            variables
+        );
+    }
+
+
+    /*
+     * Split an expression on + while
+     * keeping quoted strings together.
+     */
+
+    function splitExpression(expression) {
+
+        const parts = [];
+
+        let current = "";
+
+        let quote = null;
+
+        for (
+            let i = 0;
+            i < expression.length;
+            i++
+        ) {
+
+            const character =
+                expression[i];
+
+
+            if (
+                (character === '"' ||
+                 character === "'") &&
+                quote === null
+            ) {
+
+                quote =
+                    character;
+
+                current +=
+                    character;
+
+                continue;
+            }
+
+
+            if (
+                character === quote &&
+                expression[i - 1] !== "\\"
+            ) {
+
+                quote = null;
+
+                current +=
+                    character;
+
+                continue;
+            }
+
+
+            if (
+                character === "+" &&
+                quote === null
+            ) {
+
+                parts.push(
+                    current.trim()
+                );
+
+                current = "";
+
+                continue;
+            }
+
+
+            current +=
+                character;
+        }
+
+
+        if (current.trim() !== "") {
+
+            parts.push(
+                current.trim()
+            );
+        }
+
+
+        return parts;
+    }
+
+
+    /*
+     * Evaluate a single Prut value.
+     */
+
+    function evaluateValue(
+        value,
+        variables
+    ) {
+
+        value =
+            value.trim();
+
+
+        /*
+         * String.
+         */
+
+        if (
+            value.startsWith('"') &&
+            value.endsWith('"')
+        ) {
+
+            return parseString(
+                value.slice(1, -1)
+            );
+        }
+
+
+        if (
+            value.startsWith("'") &&
+            value.endsWith("'")
+        ) {
+
+            return parseString(
+                value.slice(1, -1)
+            );
+        }
+
+
+        /*
+         * Number.
+         */
+
+        if (
+            /^-?\d+(\.\d+)?$/.test(value)
+        ) {
+
+            return Number(value);
+        }
+
+
+        /*
+         * Variable.
+         */
+
+        if (
+            Object.prototype.hasOwnProperty.call(
+                variables,
+                value
+            )
+        ) {
+
+            return variables[value];
+        }
+
+
+        /*
+         * Unknown values are returned
+         * as plain text for now.
+         */
+
+        return value;
+    }
+
+
+    /*
+     * Parse string escapes.
+     */
+
+    function parseString(value) {
+
+        return value
+            .replace(/\\n/g, "\n")
+            .replace(/\\"/g, '"')
+            .replace(/\\\\/g, "\\");
+    }
+
+
+    /*
+     * Display an error.
+     */
+
+    function showError(
+        message,
+        sourceLine
+    ) {
+
+        output.className =
+            "output error";
+
+        output.textContent =
+            "Prut Error\n\n" +
+            message +
+            "\n\n" +
+            sourceLine;
+
+
+        status.textContent =
+            "Error";
+
+        status.className =
+            "status-error";
+
+
+        const lines =
+            codeEditor.value.split(/\r?\n/);
+
+        lineCount.textContent =
+            lines.length +
+            (lines.length === 1
+                ? " line"
+                : " lines");
+    }
+
+
+    /*
+     * Example button.
+     */
+
+    document
+        .getElementById("exampleButton")
+        .addEventListener(
+            "click",
+            () => {
+
+                codeEditor.value =
+`let name = "Prut"
+say "Hello, " + name
+say "This program runs in your browser."`;
+
+                runPrut();
+            }
+        );
+
+
+    /*
+     * Clear button.
+     */
+
+    document
+        .getElementById("clearButton")
+        .addEventListener(
+            "click",
+            () => {
+
+                codeEditor.value =
+                    "";
+
+                output.className =
+                    "output placeholder";
+
+                output.textContent =
+                    "Click Run to execute your Prut program.";
+
+                status.textContent =
+                    "Ready";
+
+                status.className =
+                    "status-success";
+
+                lineCount.textContent =
+                    "0 lines";
+            }
+        );
+
+
+    /*
+     * Run button.
+     */
+
+    document
+        .getElementById("runButton")
+        .addEventListener(
+            "click",
+            runPrut
+        );
+
+
+    /*
+     * Copy output.
+     */
+
+    document
+        .getElementById("copyButton")
+        .addEventListener(
+            "click",
+            async () => {
+
+                try {
+
+                    await navigator.clipboard.writeText(
+                        output.textContent
+                    );
+
+                    const button =
+                        document.getElementById(
+                            "copyButton"
+                        );
+
+                    const oldText =
+                        button.textContent;
+
+                    button.textContent =
+                        "Copied!";
+
+                    setTimeout(
+                        () => {
+                            button.textContent =
+                                oldText;
+                        },
+                        900
+                    );
+
+                } catch {
+
+                    /*
+                     * Clipboard access can be
+                     * blocked by some browsers.
+                     */
+
+                    alert(
+                        "Could not copy the output."
+                    );
+                }
+            }
+        );
+
+
+    /*
+     * Keyboard shortcut:
+     *
+     * Ctrl + Enter
+     */
+
+    codeEditor.addEventListener(
+        "keydown",
+        event => {
+
+            if (
+                event.key === "Enter" &&
+                (event.ctrlKey ||
+                 event.metaKey)
+            ) {
+
+                event.preventDefault();
+
+                runPrut();
+
+                return;
+            }
+
+
+            /*
+             * Tab inserts spaces instead
+             * of leaving the editor.
+             */
+
+            if (
+                event.key === "Tab"
+            ) {
+
+                event.preventDefault();
+
+                const start =
+                    codeEditor.selectionStart;
+
+                const end =
+                    codeEditor.selectionEnd;
+
+
+                codeEditor.value =
+                    codeEditor.value.slice(
+                        0,
+                        start
+                    ) +
+                    "    " +
+                    codeEditor.value.slice(
+                        end
+                    );
+
+
+                codeEditor.selectionStart =
+                    start + 4;
+
+                codeEditor.selectionEnd =
+                    start + 4;
+            }
+        }
+    );
+</script>
+
+</body>
+</html>
+```
