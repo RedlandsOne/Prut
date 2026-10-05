@@ -1,3 +1,4 @@
+```prut
 say "Hello, world!"
 
 set name = "Jed"
@@ -8,3 +9,32 @@ say number + 5
 
 say 10 * 2
 say 20 / 4
+
+set age = 14
+
+if age >= 13
+    say "You are 13 or older."
+else
+    say "You are under 13."
+end
+
+set password_correct = true
+
+if password_correct == true
+    say "Access granted."
+else
+    say "Access denied."
+end
+
+set score = 85
+
+if score >= 90
+    say "Excellent!"
+else
+    if score >= 50
+        say "Pass!"
+    else
+        say "Try again."
+    end
+end
+```
