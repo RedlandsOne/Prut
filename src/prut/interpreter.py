@@ -1,4 +1,3 @@
-```python
 """Interpreter for the Prut programming language."""
 
 from .parser import (
@@ -12,13 +11,14 @@ from .parser import (
     SetStatement,
     StringLiteral,
 )
+from .lexer import TokenType
 
 
 class Interpreter:
     """Execute a Prut abstract syntax tree."""
 
     def __init__(self):
-        self.variables: dict[str, object] = {}
+        self.variables = {}
 
     def run(self, program: Program) -> None:
         """Execute a Prut program."""
@@ -70,77 +70,83 @@ class Interpreter:
         if isinstance(expression, Identifier):
             if expression.name not in self.variables:
                 raise RuntimeError(
-                    f"Undefined variable '{expression.name}'."
+                    f"Undefined variable: {expression.name}"
                 )
 
             return self.variables[expression.name]
 
         if isinstance(expression, BinaryExpression):
-            return self._evaluate_binary(expression)
+            left = self._evaluate(expression.left)
+            right = self._evaluate(expression.right)
+
+            return self._evaluate_binary(
+                left,
+                expression.operator,
+                right,
+            )
 
         raise RuntimeError(
             f"Unknown expression: {type(expression).__name__}"
         )
 
-    def _evaluate_binary(self, expression: BinaryExpression):
+    def _evaluate_binary(
+        self,
+        left,
+        operator: TokenType,
+        right,
+    ):
         """Evaluate a binary expression."""
 
-        left = self._evaluate(expression.left)
-        right = self._evaluate(expression.right)
-
-        operator = expression.operator
-
-        if operator == "+":
+        if operator == TokenType.PLUS:
             return left + right
 
-        if operator == "-":
+        if operator == TokenType.MINUS:
             return left - right
 
-        if operator == "*":
+        if operator == TokenType.STAR:
             return left * right
 
-        if operator == "/":
+        if operator == TokenType.SLASH:
             if right == 0:
-                raise RuntimeError("Cannot divide by zero.")
+                raise RuntimeError("Division by zero")
 
             return left / right
 
-        if operator == "==":
+        if operator == TokenType.EQUALS_EQUALS:
             return left == right
 
-        if operator == "!=":
+        if operator == TokenType.NOT_EQUALS:
             return left != right
 
-        if operator == ">":
+        if operator == TokenType.GREATER_THAN:
             return left > right
 
-        if operator == "<":
+        if operator == TokenType.LESS_THAN:
             return left < right
 
-        if operator == ">=":
+        if operator == TokenType.GREATER_EQUALS:
             return left >= right
 
-        if operator == "<=":
+        if operator == TokenType.LESS_EQUALS:
             return left <= right
 
         raise RuntimeError(
-            f"Unknown operator '{operator}'."
+            f"Unknown operator: {operator}"
         )
 
-    def _is_truthy(self, value: object) -> bool:
-        """Determine whether a value is considered true."""
-
-        if isinstance(value, bool):
-            return value
+    def _is_truthy(self, value) -> bool:
+        """Determine whether a value is truthy."""
 
         if value is None:
             return False
+
+        if isinstance(value, bool):
+            return value
 
         if isinstance(value, (int, float)):
             return value != 0
 
         if isinstance(value, str):
-            return value != ""
+            return len(value) > 0
 
         return True
-```

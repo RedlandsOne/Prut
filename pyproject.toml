@@ -21,6 +21,7 @@ dev = [
 
 [project.scripts]
 prut = "prut.main:main"
+prut-gui = "prut.launcher:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

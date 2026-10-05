@@ -1,85 +1,81 @@
-```python
 """Parser for the Prut programming language."""
 
 from dataclasses import dataclass
+from typing import Any
 
 from .lexer import Token, TokenType
 
 
+# ============================================================
+# AST NODES
+# ============================================================
+
+
 @dataclass
 class Program:
-    """A complete Prut program."""
-
     statements: list
 
 
 @dataclass
 class SayStatement:
-    """A statement that prints a value."""
-
-    expression: object
+    expression: Any
 
 
 @dataclass
 class SetStatement:
-    """A statement that assigns a value to a variable."""
-
     name: str
-    expression: object
+    expression: Any
 
 
 @dataclass
 class IfStatement:
-    """A conditional statement."""
-
-    condition: object
+    condition: Any
     then_branch: list
     else_branch: list
 
 
 @dataclass
 class NumberLiteral:
-    """A numeric literal."""
-
-    value: int
+    value: int | float
 
 
 @dataclass
 class StringLiteral:
-    """A string literal."""
-
     value: str
 
 
 @dataclass
 class BooleanLiteral:
-    """A boolean literal."""
-
     value: bool
 
 
 @dataclass
 class Identifier:
-    """A variable reference."""
-
     name: str
 
 
 @dataclass
 class BinaryExpression:
-    """A binary expression."""
+    left: Any
+    operator: TokenType
+    right: Any
 
-    left: object
-    operator: str
-    right: object
+
+# ============================================================
+# PARSER
+# ============================================================
 
 
 class Parser:
-    """Convert Prut tokens into an abstract syntax tree."""
+    """Parse Prut tokens into an abstract syntax tree."""
 
     def __init__(self, tokens: list[Token]):
         self.tokens = tokens
         self.position = 0
+
+    # --------------------------------------------------------
+    # Main parser
+    # --------------------------------------------------------
 
     def parse(self) -> Program:
         """Parse an entire Prut program."""
@@ -94,39 +90,46 @@ class Parser:
 
         return Program(statements)
 
+    # --------------------------------------------------------
+    # Statements
+    # --------------------------------------------------------
+
     def _parse_statement(self):
         """Parse a single statement."""
 
+        self._skip_newlines()
+
+        if self._check_keyword("say"):
+            return self._parse_say()
+
+        if self._check_keyword("set"):
+            return self._parse_set()
+
+        if self._check_keyword("if"):
+            return self._parse_if()
+
         token = self._current()
-
-        if token.type == TokenType.KEYWORD:
-            if token.value == "say":
-                return self._parse_say()
-
-            if token.value == "set":
-                return self._parse_set()
-
-            if token.value == "if":
-                return self._parse_if()
 
         raise SyntaxError(
             f"Unexpected token '{token.value}' "
-            f"at line {token.line}, column {token.column}."
+            f"at line {token.line}, column {token.column}"
         )
 
     def _parse_say(self) -> SayStatement:
         """Parse a say statement."""
 
-        self._advance()
+        self._consume_keyword("say")
 
         expression = self._parse_expression()
+
+        self._consume_newline()
 
         return SayStatement(expression)
 
     def _parse_set(self) -> SetStatement:
         """Parse a set statement."""
 
-        self._advance()
+        self._consume_keyword("set")
 
         name = self._consume(
             TokenType.IDENTIFIER,
@@ -140,67 +143,60 @@ class Parser:
 
         expression = self._parse_expression()
 
+        self._consume_newline()
+
         return SetStatement(
             name=name.value,
             expression=expression,
         )
 
     def _parse_if(self) -> IfStatement:
-        """Parse an if/else statement."""
+        """Parse an if/else/end block."""
 
-        self._advance()
+        self._consume_keyword("if")
 
         condition = self._parse_expression()
 
-        self._consume_newline(
-            "Expected a new line after the if condition."
-        )
-
-        self._skip_newlines()
+        self._consume_newline()
 
         then_branch = []
 
-        while not self._check_keyword("else") and not self._check_keyword(
-            "end"
+        self._skip_newlines()
+
+        while (
+            not self._check_keyword("else")
+            and not self._check_keyword("end")
+            and not self._check(TokenType.EOF)
         ):
-            if self._check(TokenType.EOF):
-                token = self._current()
-
-                raise SyntaxError(
-                    f"Expected 'end' before end of file at "
-                    f"line {token.line}, column {token.column}."
-                )
-
             then_branch.append(self._parse_statement())
             self._skip_newlines()
 
         else_branch = []
 
         if self._check_keyword("else"):
-            self._advance()
-
-            self._consume_newline(
-                "Expected a new line after 'else'."
-            )
+            self._consume_keyword("else")
+            self._consume_newline()
 
             self._skip_newlines()
 
-            while not self._check_keyword("end"):
-                if self._check(TokenType.EOF):
-                    token = self._current()
-
-                    raise SyntaxError(
-                        f"Expected 'end' before end of file at "
-                        f"line {token.line}, column {token.column}."
-                    )
-
+            while (
+                not self._check_keyword("end")
+                and not self._check(TokenType.EOF)
+            ):
                 else_branch.append(self._parse_statement())
                 self._skip_newlines()
 
-        self._consume_keyword(
-            "end",
-            "Expected 'end' after if statement.",
-        )
+        if self._check_keyword("end"):
+            self._consume_keyword("end")
+            self._consume_newline()
+
+        else:
+            token = self._current()
+
+            raise SyntaxError(
+                f"Expected 'end' for if block at "
+                f"line {token.line}, column {token.column}"
+            )
 
         return IfStatement(
             condition=condition,
@@ -208,33 +204,34 @@ class Parser:
             else_branch=else_branch,
         )
 
+    # --------------------------------------------------------
+    # Expressions
+    # --------------------------------------------------------
+
     def _parse_expression(self):
         """Parse an expression."""
 
         return self._parse_comparison()
 
     def _parse_comparison(self):
-        """Parse comparison expressions."""
+        """Parse comparison operators."""
 
         expression = self._parse_term()
 
-        comparison_operators = {
+        while self._current().type in {
             TokenType.EQUALS_EQUALS,
             TokenType.NOT_EQUALS,
             TokenType.GREATER_THAN,
             TokenType.LESS_THAN,
             TokenType.GREATER_EQUALS,
             TokenType.LESS_EQUALS,
-        }
-
-        while self._current().type in comparison_operators:
+        }:
             operator = self._advance()
-
             right = self._parse_term()
 
             expression = BinaryExpression(
                 left=expression,
-                operator=operator.value,
+                operator=operator.type,
                 right=right,
             )
 
@@ -250,12 +247,11 @@ class Parser:
             TokenType.MINUS,
         }:
             operator = self._advance()
-
             right = self._parse_factor()
 
             expression = BinaryExpression(
                 left=expression,
-                operator=operator.value,
+                operator=operator.type,
                 right=right,
             )
 
@@ -271,19 +267,18 @@ class Parser:
             TokenType.SLASH,
         }:
             operator = self._advance()
-
             right = self._parse_primary()
 
             expression = BinaryExpression(
                 left=expression,
-                operator=operator.value,
+                operator=operator.type,
                 right=right,
             )
 
         return expression
 
     def _parse_primary(self):
-        """Parse primary expressions."""
+        """Parse literals, identifiers, and parenthesized expressions."""
 
         token = self._current()
 
@@ -310,42 +305,56 @@ class Parser:
 
             self._consume(
                 TokenType.RIGHT_PAREN,
-                "Expected ')' after expression.",
+                "Expected ')'.",
             )
 
             return expression
 
         raise SyntaxError(
             f"Unexpected token '{token.value}' "
-            f"at line {token.line}, column {token.column}."
+            f"at line {token.line}, column {token.column}"
         )
 
-    def _skip_newlines(self) -> None:
-        """Skip any number of newline tokens."""
+    # --------------------------------------------------------
+    # Helpers
+    # --------------------------------------------------------
 
-        while self._check(TokenType.NEWLINE):
-            self._advance()
+    def _current(self) -> Token:
+        """Return the current token."""
 
-    def _consume_newline(self, message: str) -> None:
-        """Consume exactly one newline."""
+        return self.tokens[self.position]
 
-        if not self._check(TokenType.NEWLINE):
-            token = self._current()
+    def _advance(self) -> Token:
+        """Advance to the next token."""
 
-            raise SyntaxError(
-                f"{message} "
-                f"Got '{token.value}' at line "
-                f"{token.line}, column {token.column}."
-            )
+        token = self._current()
 
-        self._advance()
+        if not self._check(TokenType.EOF):
+            self.position += 1
+
+        return token
+
+    def _check(self, token_type: TokenType) -> bool:
+        """Check the current token type."""
+
+        return self._current().type == token_type
+
+    def _check_keyword(self, keyword: str) -> bool:
+        """Check whether the current token is a keyword."""
+
+        token = self._current()
+
+        return (
+            token.type == TokenType.KEYWORD
+            and token.value == keyword
+        )
 
     def _consume(
         self,
         token_type: TokenType,
         message: str,
     ) -> Token:
-        """Consume a token of a specific type."""
+        """Consume a token of the expected type."""
 
         if self._check(token_type):
             return self._advance()
@@ -355,14 +364,10 @@ class Parser:
         raise SyntaxError(
             f"{message} "
             f"Got '{token.value}' at line "
-            f"{token.line}, column {token.column}."
+            f"{token.line}, column {token.column}"
         )
 
-    def _consume_keyword(
-        self,
-        keyword: str,
-        message: str,
-    ) -> Token:
+    def _consume_keyword(self, keyword: str) -> Token:
         """Consume a specific keyword."""
 
         if self._check_keyword(keyword):
@@ -371,38 +376,18 @@ class Parser:
         token = self._current()
 
         raise SyntaxError(
-            f"{message} "
-            f"Got '{token.value}' at line "
-            f"{token.line}, column {token.column}."
+            f"Expected '{keyword}' at line "
+            f"{token.line}, column {token.column}"
         )
 
-    def _check(self, token_type: TokenType) -> bool:
-        """Check the current token type."""
+    def _consume_newline(self) -> None:
+        """Consume a newline if one exists."""
 
-        return self._current().type == token_type
+        if self._check(TokenType.NEWLINE):
+            self._advance()
 
-    def _check_keyword(self, keyword: str) -> bool:
-        """Check whether the current token is a specific keyword."""
+    def _skip_newlines(self) -> None:
+        """Skip any number of blank lines."""
 
-        token = self._current()
-
-        return (
-            token.type == TokenType.KEYWORD
-            and token.value == keyword
-        )
-
-    def _current(self) -> Token:
-        """Return the current token."""
-
-        return self.tokens[self.position]
-
-    def _advance(self) -> Token:
-        """Advance and return the current token."""
-
-        token = self.tokens[self.position]
-
-        if not self._check(TokenType.EOF):
-            self.position += 1
-
-        return token
-```
+        while self._check(TokenType.NEWLINE):
+            self._advance()

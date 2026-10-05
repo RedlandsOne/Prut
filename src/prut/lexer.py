@@ -1,4 +1,3 @@
-```python
 """Lexer for the Prut programming language."""
 
 from dataclasses import dataclass
@@ -49,6 +48,7 @@ KEYWORDS = {
     "set",
     "if",
     "else",
+    "end",
     "repeat",
     "function",
 }
@@ -62,7 +62,7 @@ BOOLEANS = {
 class Lexer:
     """Convert Prut source code into tokens."""
 
-    def __init__(self, source: str):
+    def __init__(self, source: str) -> None:
         self.source = source
         self.position = 0
         self.line = 1
@@ -71,10 +71,10 @@ class Lexer:
     def tokenize(self) -> list[Token]:
         """Tokenize the entire source."""
 
-        tokens = []
+        tokens: list[Token] = []
 
-        while self.position < len(self.source):
-            character = self.source[self.position]
+        while not self._at_end():
+            character = self._current()
 
             if character in " \t\r":
                 self._advance()
@@ -89,46 +89,38 @@ class Lexer:
                         self.column,
                     )
                 )
-                self._advance()
-                self.line += 1
-                self.column = 1
+                self._advance_line()
                 continue
 
             if character == '"':
-                tokens.append(self._read_string())
+                tokens.append(self._string())
                 continue
 
             if character.isdigit():
-                tokens.append(self._read_number())
+                tokens.append(self._number())
                 continue
 
             if character.isalpha() or character == "_":
-                tokens.append(self._read_identifier())
+                tokens.append(self._identifier())
                 continue
 
             line = self.line
             column = self.column
 
-            if character == "+":
+            if self._match("+"):
                 tokens.append(Token(TokenType.PLUS, "+", line, column))
-                self._advance()
 
-            elif character == "-":
+            elif self._match("-"):
                 tokens.append(Token(TokenType.MINUS, "-", line, column))
-                self._advance()
 
-            elif character == "*":
+            elif self._match("*"):
                 tokens.append(Token(TokenType.STAR, "*", line, column))
-                self._advance()
 
-            elif character == "/":
+            elif self._match("/"):
                 tokens.append(Token(TokenType.SLASH, "/", line, column))
-                self._advance()
 
-            elif character == "=":
-                self._advance()
-
-                if self._current_character() == "=":
+            elif self._match("="):
+                if self._match("="):
                     tokens.append(
                         Token(
                             TokenType.EQUALS_EQUALS,
@@ -137,7 +129,6 @@ class Lexer:
                             column,
                         )
                     )
-                    self._advance()
                 else:
                     tokens.append(
                         Token(
@@ -148,10 +139,8 @@ class Lexer:
                         )
                     )
 
-            elif character == "!":
-                self._advance()
-
-                if self._current_character() == "=":
+            elif self._match("!"):
+                if self._match("="):
                     tokens.append(
                         Token(
                             TokenType.NOT_EQUALS,
@@ -160,17 +149,14 @@ class Lexer:
                             column,
                         )
                     )
-                    self._advance()
                 else:
                     raise SyntaxError(
                         f"Unexpected character '!' at "
-                        f"line {line}, column {column}."
+                        f"line {line}, column {column}"
                     )
 
-            elif character == ">":
-                self._advance()
-
-                if self._current_character() == "=":
+            elif self._match(">"):
+                if self._match("="):
                     tokens.append(
                         Token(
                             TokenType.GREATER_EQUALS,
@@ -179,7 +165,6 @@ class Lexer:
                             column,
                         )
                     )
-                    self._advance()
                 else:
                     tokens.append(
                         Token(
@@ -190,10 +175,8 @@ class Lexer:
                         )
                     )
 
-            elif character == "<":
-                self._advance()
-
-                if self._current_character() == "=":
+            elif self._match("<"):
+                if self._match("="):
                     tokens.append(
                         Token(
                             TokenType.LESS_EQUALS,
@@ -202,7 +185,6 @@ class Lexer:
                             column,
                         )
                     )
-                    self._advance()
                 else:
                     tokens.append(
                         Token(
@@ -213,7 +195,7 @@ class Lexer:
                         )
                     )
 
-            elif character == "(":
+            elif self._match("("):
                 tokens.append(
                     Token(
                         TokenType.LEFT_PAREN,
@@ -222,9 +204,8 @@ class Lexer:
                         column,
                     )
                 )
-                self._advance()
 
-            elif character == ")":
+            elif self._match(")"):
                 tokens.append(
                     Token(
                         TokenType.RIGHT_PAREN,
@@ -233,12 +214,11 @@ class Lexer:
                         column,
                     )
                 )
-                self._advance()
 
             else:
                 raise SyntaxError(
                     f"Unexpected character '{character}' at "
-                    f"line {line}, column {column}."
+                    f"line {line}, column {column}"
                 )
 
         tokens.append(
@@ -252,7 +232,7 @@ class Lexer:
 
         return tokens
 
-    def _read_string(self) -> Token:
+    def _string(self) -> Token:
         """Read a string literal."""
 
         line = self.line
@@ -260,74 +240,66 @@ class Lexer:
 
         self._advance()
 
-        characters = []
+        characters: list[str] = []
 
-        while self.position < len(self.source):
-            character = self.source[self.position]
-
-            if character == '"':
-                self._advance()
-
-                return Token(
-                    TokenType.STRING,
-                    "".join(characters),
-                    line,
-                    column,
-                )
-
-            if character == "\n":
+        while not self._at_end() and self._current() != '"':
+            if self._current() == "\n":
                 raise SyntaxError(
-                    f"Unterminated string at line {line}, "
-                    f"column {column}."
+                    f"Unterminated string at line {line}, column {column}"
                 )
 
-            characters.append(character)
+            characters.append(self._current())
             self._advance()
 
-        raise SyntaxError(
-            f"Unterminated string at line {line}, column {column}."
-        )
+        if self._at_end():
+            raise SyntaxError(
+                f"Unterminated string at line {line}, column {column}"
+            )
 
-    def _read_number(self) -> Token:
-        """Read a numeric literal."""
-
-        line = self.line
-        column = self.column
-
-        characters = []
-
-        while (
-            self.position < len(self.source)
-            and self.source[self.position].isdigit()
-        ):
-            characters.append(self.source[self.position])
-            self._advance()
-
-        value = int("".join(characters))
+        self._advance()
 
         return Token(
-            TokenType.NUMBER,
-            value,
+            TokenType.STRING,
+            "".join(characters),
             line,
             column,
         )
 
-    def _read_identifier(self) -> Token:
+    def _number(self) -> Token:
+        """Read a number literal."""
+
+        line = self.line
+        column = self.column
+
+        characters: list[str] = []
+
+        while not self._at_end() and self._current().isdigit():
+            characters.append(self._current())
+            self._advance()
+
+        return Token(
+            TokenType.NUMBER,
+            int("".join(characters)),
+            line,
+            column,
+        )
+
+    def _identifier(self) -> Token:
         """Read an identifier, keyword, or boolean."""
 
         line = self.line
         column = self.column
 
-        characters = []
+        characters: list[str] = []
 
-        while self.position < len(self.source):
-            character = self.source[self.position]
+        while not self._at_end():
+            character = self._current()
 
-            if not (character.isalnum() or character == "_"):
+            if character.isalnum() or character == "_":
+                characters.append(character)
+                self._advance()
+            else:
                 break
-
-            characters.append(character)
-            self._advance()
 
         value = "".join(characters)
 
@@ -354,11 +326,17 @@ class Lexer:
             column,
         )
 
-    def _current_character(self) -> str | None:
-        """Return the current character without advancing."""
+    def _match(self, expected: str) -> bool:
+        """Consume a character if it matches."""
 
-        if self.position >= len(self.source):
-            return None
+        if self._at_end() or self._current() != expected:
+            return False
+
+        self._advance()
+        return True
+
+    def _current(self) -> str:
+        """Return the current character."""
 
         return self.source[self.position]
 
@@ -367,4 +345,15 @@ class Lexer:
 
         self.position += 1
         self.column += 1
-```
+
+    def _advance_line(self) -> None:
+        """Move to the next line."""
+
+        self.position += 1
+        self.line += 1
+        self.column = 1
+
+    def _at_end(self) -> bool:
+        """Return whether the source has been fully consumed."""
+
+        return self.position >= len(self.source)
