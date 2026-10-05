@@ -1,9 +1,24 @@
-````markdown
 # Prut
 
 > A small, modern programming language built from scratch.
 
-Prut is an experimental programming language designed to be simple to learn, easy to understand, and fun to build with.
+Prut is an experimental programming language designed to be simple, readable, and easy to understand while exploring how programming languages work internally.
+
+## Features
+
+Prut currently supports:
+
+* Variables
+* Strings
+* Numbers
+* Booleans
+* Arithmetic
+* Comparisons
+* `if` / `else` / `end` conditionals
+* Nested conditionals
+* Interactive REPL
+* Graphical launcher
+* Running `.prut` source files
 
 ## Example
 
@@ -13,299 +28,93 @@ say "Hello, world!"
 set name = "Jed"
 say name
 
-set age = 14
+set number = 10
+say number + 5
 
-if age >= 13
-    say "You are 13 or older."
+if number >= 10
+    say "Number is 10 or greater."
 else
-    say "You are under 13."
+    say "Number is less than 10."
 end
-````
+```
 
 Output:
 
 ```text
 Hello, world!
 Jed
-You are 13 or older.
+15
+Number is 10 or greater.
 ```
 
-## Interactive Mode
+## Installation
 
-Prut includes an interactive REPL.
+Clone the repository:
 
-Start it with:
+```bash
+git clone https://github.com/RedlandsOne/Prut.git
+cd Prut
+```
+
+Install Prut in editable mode:
+
+```bash
+python -m pip install -e .
+```
+
+Prut requires **Python 3.10 or newer**.
+
+## Running Prut
+
+### Interactive REPL
 
 ```bash
 prut
 ```
 
-Then write Prut code directly:
+You can also run:
 
-```text
-Prut 0.2.0
-Interactive shell
-Type 'exit' or 'quit' to leave.
-
->>> say "Hello"
-Hello
->>> set number = 10
->>> say number + 5
-15
->>> say number >= 10
-True
->>> exit
+```bash
+python -m prut
 ```
 
-## Running a Program
-
-Prut programs use the `.prut` file extension.
-
-For example:
+### Run a program
 
 ```bash
 prut examples/hello.prut
 ```
 
-You can also run a program through Python:
+### Graphical launcher
 
 ```bash
-python -m prut examples/hello.prut
+prut-gui
 ```
 
-## Current Features
+The graphical launcher provides a built-in editor and output panel for writing and running Prut programs without using the terminal.
 
-Prut 0.2 currently supports:
-
-### Values
-
-* Strings
-* Numbers
-* Booleans
-* Variables
-
-### Statements
-
-* `say`
-* `set`
-* `if`
-* `else`
-* `end`
-
-### Arithmetic Operators
-
-* `+` Addition
-* `-` Subtraction
-* `*` Multiplication
-* `/` Division
-
-### Comparison Operators
-
-* `==` Equal
-* `!=` Not equal
-* `>` Greater than
-* `<` Less than
-* `>=` Greater than or equal
-* `<=` Less than or equal
-
-### Other
-
-* Parentheses
-* Operator precedence
-* Nested `if` statements
-* Interactive REPL
-* Syntax errors
-* Runtime errors
-* Automated tests
-* GitHub Actions
-
-## Conditional Statements
-
-Prut uses `if`, `else`, and `end` for conditional logic.
-
-```prut
-set age = 14
-
-if age >= 13
-    say "Allowed"
-else
-    say "Not allowed"
-end
-```
-
-The condition is evaluated first.
-
-If it is true, the code inside the `if` block runs.
-
-If it is false and an `else` block exists, the `else` block runs.
-
-## Boolean Values
-
-Prut supports two boolean values:
-
-```prut
-true
-false
-```
-
-They can be stored in variables:
-
-```prut
-set online = true
-set connected = false
-
-say online
-say connected
-```
-
-## Comparisons
-
-Prut supports six comparison operators:
-
-```prut
-10 == 10
-10 != 5
-10 > 5
-5 < 10
-10 >= 10
-5 <= 10
-```
-
-Comparisons produce a boolean result.
-
-For example:
-
-```prut
-set age = 14
-
-say age >= 13
-```
-
-Output:
-
-```text
-True
-```
-
-## Nested Conditions
-
-Conditions can be placed inside other conditions:
-
-```prut
-set score = 85
-
-if score >= 90
-    say "Excellent!"
-else
-    if score >= 50
-        say "Pass!"
-    else
-        say "Try again."
-    end
-end
-```
-
-## How Prut Works
-
-Prut currently uses an interpreter architecture:
-
-```text
-Prut source code
-       │
-       ▼
-     Lexer
-       │
-       ▼
-     Tokens
-       │
-       ▼
-     Parser
-       │
-       ▼
-      AST
-       │
-       ▼
-   Interpreter
-       │
-       ▼
-     Output
-```
-
-### Lexer
-
-The lexer converts Prut source code into tokens.
-
-It recognizes:
-
-* Keywords
-* Identifiers
-* Strings
-* Numbers
-* Booleans
-* Arithmetic operators
-* Comparison operators
-* Assignment
-* Parentheses
-* Newlines
-
-### Parser
-
-The parser converts those tokens into an Abstract Syntax Tree (AST).
-
-It currently understands:
-
-* `say`
-* `set`
-* `if`
-* `else`
-* `end`
-* Arithmetic expressions
-* Comparison expressions
-* Variables
-* Strings
-* Numbers
-* Booleans
-
-### Interpreter
-
-The interpreter evaluates the AST and executes the program.
-
-It currently handles:
-
-* Variables
-* Strings
-* Numbers
-* Booleans
-* Arithmetic
-* Comparisons
-* Conditional statements
-* Runtime errors
-
-## Repository Structure
+## Project Structure
 
 ```text
 prut/
 ├── .github/
 │   └── workflows/
 │       └── tests.yml
-│
 ├── examples/
 │   └── hello.prut
-│
 ├── src/
 │   └── prut/
 │       ├── __init__.py
 │       ├── __main__.py
 │       ├── interpreter.py
+│       ├── launcher.py
 │       ├── lexer.py
 │       ├── main.py
 │       ├── parser.py
 │       └── repl.py
-│
 ├── tests/
 │   └── test_basic.py
-│
-├── .gitignore
+├── prut_app.py
+├── prutlog.ico
 ├── CHANGELOG.md
 ├── CODE_OF_CONDUCT.md
 ├── CONTRIBUTING.md
@@ -316,148 +125,38 @@ prut/
 
 ## Development
 
-Prut is currently developed in Python.
-
-### Requirements
-
-* Python 3.10 or newer
-* Git
-
-### Clone the repository
+Install the development dependencies:
 
 ```bash
-git clone https://github.com/RedlandsOne/prut.git
-cd prut
+python -m pip install -e ".[dev]"
 ```
 
-### Create a virtual environment
-
-Windows:
-
-```powershell
-python -m venv .venv
-.venv\Scripts\Activate.ps1
-```
-
-Linux or macOS:
-
-```bash
-python -m venv .venv
-source .venv/bin/activate
-```
-
-### Install Prut
-
-Install Prut with its development dependencies:
-
-```bash
-pip install -e ".[dev]"
-```
-
-### Run Prut
-
-Start the REPL:
-
-```bash
-prut
-```
-
-Run an example:
-
-```bash
-prut examples/hello.prut
-```
-
-### Run Tests
+Run the test suite:
 
 ```bash
 pytest
 ```
 
-GitHub Actions also automatically runs the test suite when changes are pushed or a pull request is opened.
+Prut also uses GitHub Actions to automatically run the tests when changes are pushed or pull requests are opened.
 
-## Roadmap
+## Version
 
-### Prut 0.1
-
-* [x] Basic project structure
-* [x] Lexer
-* [x] Parser
-* [x] Interpreter
-* [x] Variables
-* [x] Strings
-* [x] Numbers
-* [x] Basic arithmetic
-* [x] REPL
-* [x] Automated tests
-* [x] GitHub Actions
-
-### Prut 0.2
-
-* [x] Booleans
-* [x] Comparisons
-* [x] `if`
-* [x] `else`
-* [x] Nested conditions
-* [x] Better conditional error handling
-
-### Prut 0.3
-
-* [ ] `and`
-* [ ] `or`
-* [ ] `not`
-* [ ] `while`
-* [ ] `repeat`
-* [ ] `break`
-* [ ] `continue`
-
-### Prut 0.4
-
-* [ ] Lists
-* [ ] List indexing
-* [ ] `in`
-* [ ] `len()`
-
-### Prut 0.5
-
-* [ ] Functions
-* [ ] Function arguments
-* [ ] Return values
-* [ ] Local variables
-
-### Prut 0.6
-
-* [ ] Modules
-* [ ] Imports
-* [ ] Standard library
-
-### Prut 1.0
-
-* [ ] Stable language specification
-* [ ] Package manager
-* [ ] Comprehensive documentation
-* [ ] Standard library
-* [ ] Production-ready tooling
+**Current version: 0.2.0**
 
 ## Project Status
 
-Prut is **experimental and under active development**.
+Prut is an experimental project under active development.
 
-The language syntax and implementation may change significantly before version 1.0.
+The goal is to continue expanding the language while keeping its syntax simple and understandable.
 
-## Contributing
-
-Contributions, ideas, bug reports, documentation improvements, and language experiments are welcome.
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for development and contribution guidelines.
-
-Please also read the [Code of Conduct](CODE_OF_CONDUCT.md).
+Future versions may introduce additional language features, improved tooling, and a more complete development environment.
 
 ## License
 
-Prut is open source software licensed under the MIT License.
+Prut is released under the **MIT License**.
 
-See [LICENSE](LICENSE) for the full license text.
+## Redlands One
 
-```
-```
+Prut is developed by **Redlands One**, an independent technology organization focused on software, programming languages, operating systems, networking, and experimental technology projects.
+
+**GitHub:** https://github.com/RedlandsOne
