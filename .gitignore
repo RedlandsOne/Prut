@@ -7,11 +7,14 @@ __pycache__/
 .venv/
 venv/
 env/
+ENV/
 
 # Testing
 .pytest_cache/
 .coverage
 htmlcov/
+.tox/
+.nox/
 
 # Build artifacts
 build/
@@ -24,10 +27,11 @@ dist/
 # Local Prut files
 myprogram.prut
 
-# IDEs
+# IDEs and editors
 .vscode/
 .idea/
 
-# OS files
+# Operating system files
 .DS_Store
 Thumbs.db
+desktop.ini
