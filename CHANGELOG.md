@@ -1,92 +1,112 @@
-```markdown
 # Changelog
 
-All notable changes to Prut will be documented in this file.
+All notable changes to Prut are documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project follows Semantic Versioning.
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
-### Added
+### Planned
 
-- Continued development of the Prut programming language.
+- `repeat` loops
+- Functions
+- User input
+- Additional data types
+- Logical operators
+- Improved error messages
+- Standard library features
+- Syntax highlighting
+- Editor tooling
+- Language Server Protocol support
+
+---
 
 ## [0.2.0] - 2026-10-05
 
 ### Added
 
-- Boolean values:
-  - `true`
-  - `false`
-- Comparison operators:
-  - `==`
-  - `!=`
-  - `>`
-  - `<`
-  - `>=`
-  - `<=`
-- `if` statements.
-- `else` statements.
-- `end` to close conditional blocks.
-- Nested conditional statements.
-- Boolean expression evaluation.
-- Conditional execution based on variables.
-- Lexer support for boolean literals.
-- Lexer support for comparison operators.
-- Parser support for comparison expressions.
-- Parser support for conditional statements.
-- Interpreter support for boolean values.
-- Interpreter support for comparison operators.
-- Interpreter support for `if` and `else`.
-- Tests for booleans.
-- Tests for comparison operators.
-- Tests for conditional statements.
-- Tests for nested conditions.
-- Updated example program.
-- Updated project documentation.
+#### Language
 
-### Changed
+- Variable assignment using `set`
+- Output using `say`
+- String literals
+- Integer and floating-point numbers
+- Boolean values using `true` and `false`
+- Arithmetic expressions
+- Comparison expressions
+- `if` statements
+- `else` branches
+- Explicit `end` statements
+- Nested conditional statements
+- Variable references
+- Parenthesised expressions
 
-- Updated the Prut language documentation for version 0.2.
-- Expanded the language roadmap.
-- Improved the interpreter's expression handling.
+#### Operators
 
-## [0.1.0] - 2026-10-04
+Added arithmetic operators:
+
+- `+`
+- `-`
+- `*`
+- `/`
+
+Added comparison operators:
+
+- `==`
+- `!=`
+- `>`
+- `<`
+- `>=`
+- `<=`
+
+#### Runtime
+
+- Variable storage and lookup
+- Boolean evaluation
+- Arithmetic evaluation
+- Comparison evaluation
+- Truthy/falsy condition handling
+- Undefined-variable errors
+- Division-by-zero errors
+- Runtime error reporting
+
+#### Developer Experience
+
+- Interactive Prut REPL
+- Coloured REPL banner
+- `.prut` source-file execution
+- `python -m prut` support
+- Prut Launcher graphical interface
+- Windows executable packaging with PyInstaller
+- Automated pytest test suite
+- GitHub Actions CI
+
+### Improved
+
+- Parser now handles operator precedence
+- Parser supports nested blocks
+- Syntax errors include line and column information
+- CLI provides clearer usage information
+- Windows terminal output supports ANSI colours
+
+---
+
+## [0.1.0]
 
 ### Added
 
-- Initial Prut project structure.
-- Prut package configuration.
-- Lexer with support for:
-  - Keywords
-  - Identifiers
-  - Strings
-  - Numbers
-  - Arithmetic operators
-  - Assignment
-  - Parentheses
-  - Newlines
-- Parser with support for:
-  - `say` statements
-  - `set` statements
-  - String literals
-  - Number literals
-  - Variables
-  - Arithmetic expressions
-  - Operator precedence
-- Interpreter with support for:
-  - Variables
-  - Strings
-  - Numbers
-  - Addition
-  - Subtraction
-  - Multiplication
-  - Division
-  - Runtime errors
-- Command-line interface.
-- Interactive Prut REPL.
-- Example Prut program.
-- Automated tests.
-- GitHub Actions test workflow.
-```
+- Initial Prut project
+- Basic lexer
+- Basic parser
+- Abstract Syntax Tree
+- Interpreter
+- `say` statement
+- String literals
+- Number literals
+- Basic command-line execution
+
+---
+
+[Unreleased]: https://github.com/RedlandsOne/Prut/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/RedlandsOne/Prut/releases/tag/v0.2.0
+[0.1.0]: https://github.com/RedlandsOne/Prut/releases/tag/v0.1.0
