@@ -1,3 +1,4 @@
+````markdown
 # Prut
 
 > A small, modern programming language built from scratch.
@@ -12,16 +13,21 @@ say "Hello, world!"
 set name = "Jed"
 say name
 
-set number = 10
-say number + 5
-```
+set age = 14
+
+if age >= 13
+    say "You are 13 or older."
+else
+    say "You are under 13."
+end
+````
 
 Output:
 
 ```text
 Hello, world!
 Jed
-15
+You are 13 or older.
 ```
 
 ## Interactive Mode
@@ -37,7 +43,7 @@ prut
 Then write Prut code directly:
 
 ```text
-Prut 0.1.0
+Prut 0.2.0
 Interactive shell
 Type 'exit' or 'quit' to leave.
 
@@ -46,6 +52,8 @@ Hello
 >>> set number = 10
 >>> say number + 5
 15
+>>> say number >= 10
+True
 >>> exit
 ```
 
@@ -67,86 +75,135 @@ python -m prut examples/hello.prut
 
 ## Current Features
 
-Prut 0.1 currently supports:
+Prut 0.2 currently supports:
+
+### Values
 
 * Strings
 * Numbers
+* Booleans
 * Variables
-* `say` statements
-* `set` statements
-* Addition
-* Subtraction
-* Multiplication
-* Division
+
+### Statements
+
+* `say`
+* `set`
+* `if`
+* `else`
+* `end`
+
+### Arithmetic Operators
+
+* `+` Addition
+* `-` Subtraction
+* `*` Multiplication
+* `/` Division
+
+### Comparison Operators
+
+* `==` Equal
+* `!=` Not equal
+* `>` Greater than
+* `<` Less than
+* `>=` Greater than or equal
+* `<=` Less than or equal
+
+### Other
+
 * Parentheses
 * Operator precedence
+* Nested `if` statements
 * Interactive REPL
 * Syntax errors
 * Runtime errors
 * Automated tests
+* GitHub Actions
 
-## Goals
+## Conditional Statements
 
-Prut is being built with a few simple goals:
+Prut uses `if`, `else`, and `end` for conditional logic.
 
-* Easy-to-read syntax
-* Beginner-friendly programming
-* Lightweight execution
-* Clear and useful error messages
-* A simple standard library
-* Easy extensibility
-* Built from scratch
+```prut
+set age = 14
 
-## Roadmap
+if age >= 13
+    say "Allowed"
+else
+    say "Not allowed"
+end
+```
 
-### Prut 0.1
+The condition is evaluated first.
 
-* [x] Basic project structure
-* [x] Lexer
-* [x] Parser
-* [x] Interpreter
-* [x] Variables
-* [x] Strings
-* [x] Numbers
-* [x] Basic arithmetic
-* [x] REPL
-* [x] Automated tests
-* [x] GitHub Actions
+If it is true, the code inside the `if` block runs.
 
-### Prut 0.2
+If it is false and an `else` block exists, the `else` block runs.
 
-* [ ] Booleans
-* [ ] Comparisons
-* [ ] `if`
-* [ ] `else`
-* [ ] Better error messages
+## Boolean Values
 
-### Prut 0.3
+Prut supports two boolean values:
 
-* [ ] `while`
-* [ ] `repeat`
-* [ ] `for`
-* [ ] Lists
+```prut
+true
+false
+```
 
-### Prut 0.4
+They can be stored in variables:
 
-* [ ] Functions
-* [ ] Function arguments
-* [ ] Return values
+```prut
+set online = true
+set connected = false
 
-### Prut 0.5
+say online
+say connected
+```
 
-* [ ] Modules
-* [ ] Imports
-* [ ] Standard library
+## Comparisons
 
-### Prut 1.0
+Prut supports six comparison operators:
 
-* [ ] Stable language specification
-* [ ] Package manager
-* [ ] Comprehensive documentation
-* [ ] Standard library
-* [ ] Production-ready tooling
+```prut
+10 == 10
+10 != 5
+10 > 5
+5 < 10
+10 >= 10
+5 <= 10
+```
+
+Comparisons produce a boolean result.
+
+For example:
+
+```prut
+set age = 14
+
+say age >= 13
+```
+
+Output:
+
+```text
+True
+```
+
+## Nested Conditions
+
+Conditions can be placed inside other conditions:
+
+```prut
+set score = 85
+
+if score >= 90
+    say "Excellent!"
+else
+    if score >= 50
+        say "Pass!"
+    else
+        say "Try again."
+    end
+end
+```
 
 ## How Prut Works
 
@@ -178,13 +235,51 @@ Prut source code
 
 The lexer converts Prut source code into tokens.
 
+It recognizes:
+
+* Keywords
+* Identifiers
+* Strings
+* Numbers
+* Booleans
+* Arithmetic operators
+* Comparison operators
+* Assignment
+* Parentheses
+* Newlines
+
 ### Parser
 
 The parser converts those tokens into an Abstract Syntax Tree (AST).
 
+It currently understands:
+
+* `say`
+* `set`
+* `if`
+* `else`
+* `end`
+* Arithmetic expressions
+* Comparison expressions
+* Variables
+* Strings
+* Numbers
+* Booleans
+
 ### Interpreter
 
 The interpreter evaluates the AST and executes the program.
+
+It currently handles:
+
+* Variables
+* Strings
+* Numbers
+* Booleans
+* Arithmetic
+* Comparisons
+* Conditional statements
+* Runtime errors
 
 ## Repository Structure
 
@@ -281,6 +376,75 @@ pytest
 
 GitHub Actions also automatically runs the test suite when changes are pushed or a pull request is opened.
 
+## Roadmap
+
+### Prut 0.1
+
+* [x] Basic project structure
+* [x] Lexer
+* [x] Parser
+* [x] Interpreter
+* [x] Variables
+* [x] Strings
+* [x] Numbers
+* [x] Basic arithmetic
+* [x] REPL
+* [x] Automated tests
+* [x] GitHub Actions
+
+### Prut 0.2
+
+* [x] Booleans
+* [x] Comparisons
+* [x] `if`
+* [x] `else`
+* [x] Nested conditions
+* [x] Better conditional error handling
+
+### Prut 0.3
+
+* [ ] `and`
+* [ ] `or`
+* [ ] `not`
+* [ ] `while`
+* [ ] `repeat`
+* [ ] `break`
+* [ ] `continue`
+
+### Prut 0.4
+
+* [ ] Lists
+* [ ] List indexing
+* [ ] `in`
+* [ ] `len()`
+
+### Prut 0.5
+
+* [ ] Functions
+* [ ] Function arguments
+* [ ] Return values
+* [ ] Local variables
+
+### Prut 0.6
+
+* [ ] Modules
+* [ ] Imports
+* [ ] Standard library
+
+### Prut 1.0
+
+* [ ] Stable language specification
+* [ ] Package manager
+* [ ] Comprehensive documentation
+* [ ] Standard library
+* [ ] Production-ready tooling
+
+## Project Status
+
+Prut is **experimental and under active development**.
+
+The language syntax and implementation may change significantly before version 1.0.
+
 ## Contributing
 
 Contributions, ideas, bug reports, documentation improvements, and language experiments are welcome.
@@ -289,14 +453,11 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for development and contribution guidelin
 
 Please also read the [Code of Conduct](CODE_OF_CONDUCT.md).
 
-## Project Status
-
-Prut is **experimental and under active development**.
-
-The language syntax and implementation may change significantly before version 1.0.
-
 ## License
 
 Prut is open source software licensed under the MIT License.
 
 See [LICENSE](LICENSE) for the full license text.
+
+```
+```
