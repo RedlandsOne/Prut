@@ -1,4 +1,3 @@
 """Prut programming language."""
 
-**version** = "0.1.0"
-**name** = "Prut"
+__version__ = "0.1.0"

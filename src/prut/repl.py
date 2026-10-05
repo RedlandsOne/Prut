@@ -1,50 +1,38 @@
 """Interactive REPL for the Prut programming language."""
 
+from . import __version__
 from .interpreter import Interpreter
 from .lexer import Lexer
 from .parser import Parser
-from . import **version**
+
 
 def run_repl() -> None:
-"""Start the interactive Prut shell."""
+    """Start the interactive Prut shell."""
+    print(f"Prut {__version__}")
+    print("Interactive shell")
+    print("Type 'exit' or 'quit' to leave.")
+    print()
 
-```
-print(f"Prut {__version__}")
-print("Interactive shell")
-print("Type 'exit' or 'quit' to leave.")
-print()
+    interpreter = Interpreter()
 
-interpreter = Interpreter()
+    while True:
+        try:
+            source = input(">>> ")
+        except (EOFError, KeyboardInterrupt):
+            print()
+            break
 
-while True:
-    try:
-        source = input(">>> ")
+        command = source.strip()
 
-    except EOFError:
-        print()
-        break
+        if command in {"exit", "quit"}:
+            break
 
-    except KeyboardInterrupt:
-        print()
-        break
+        if not command:
+            continue
 
-    command = source.strip()
-
-    if command in {"exit", "quit"}:
-        break
-
-    if not command:
-        continue
-
-    try:
-        lexer = Lexer(source)
-        tokens = lexer.tokenize()
-
-        parser = Parser(tokens)
-        program = parser.parse()
-
-        interpreter.run(program)
-
-    except (SyntaxError, RuntimeError) as error:
-        print(f"Prut error: {error}")
-```
+        try:
+            tokens = Lexer(source).tokenize()
+            program = Parser(tokens).parse()
+            interpreter.run(program)
+        except (SyntaxError, RuntimeError) as error:
+            print(f"Prut error: {error}")
